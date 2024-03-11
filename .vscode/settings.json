@@ -1,0 +1,9 @@
+{
+    "python.analysis.extraPaths": [
+        "./LW_Ciphers/Grain-128a",
+        "./LW_Ciphers/Mickey-v2",
+        "./LW_Ciphers/Trivium",
+        "./LW_Ciphers/Salsa",
+        "./LW_Ciphers/Sosemanuk"
+    ]
+}
