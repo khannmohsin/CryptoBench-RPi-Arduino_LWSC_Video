@@ -7,7 +7,7 @@ import secrets
 import argparse
 import sys
 
-Server_IP = '10.239.148.69'
+Server_IP = '10.239.148.76'
 Server_Port = 8000
 
 def generate_random_key(num_bits):
@@ -57,10 +57,10 @@ def main():
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
                 frame_bytes = cv2.imencode('.JPEG', frame)[1].tobytes()
-                frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
-                hex_frames_bytes_literal = bytes(frame_hex.encode())
+                #frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
+                #hex_frames_bytes_literal = bytes(frame_hex.encode())
                 # Encrypt the frame
-                encrypted_bytes, _, _ = c_grain128_encrypt_file(hex_frames_bytes_literal, key)
+                encrypted_bytes, _, _ = c_grain128_encrypt_file(frame_bytes, key)
                 # Send the encrypted frame
                 connection.write(struct.pack('<L', len(encrypted_bytes)))
                 connection.flush()
@@ -68,7 +68,7 @@ def main():
                 connection.flush()
 
         elif args.algorithm == "mickey":
-            sys.path.append('LW_Ciphers/Mickey')
+            sys.path.append('LW_Ciphers/Mickey-v2')
             from cMickey_main import c_mickey_encrypt_file
             print("Using Mickey for encrypting the video stream")
             random_key_bits, random_bytes = generate_random_key(80)
@@ -81,11 +81,11 @@ def main():
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
                 frame_bytes = cv2.imencode('.JPEG', frame)[1].tobytes()
-                frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
-                hex_frames_bytes_literal = bytes(frame_hex.encode())
+                #frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
+                #hex_frames_bytes_literal = bytes(frame_hex.encode())
 
                 # Encrypt the frame
-                encrypted_bytes, _, _ = c_mickey_encrypt_file(hex_frames_bytes_literal, key)
+                encrypted_bytes, _, _ = c_mickey_encrypt_file(frame_bytes, key)
                 # Send the encrypted frame
                 connection.write(struct.pack('<L', len(encrypted_bytes)))
                 connection.flush()
@@ -101,13 +101,13 @@ def main():
             # with open('key.txt', 'wb') as key_file:
             #     key_file.write(key)
 
-            b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
+            key = b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
                 frame_bytes = cv2.imencode('.JPEG', frame)[1].tobytes()
-                # frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
-                # hex_frames_bytes_literal = bytes(frame_hex)
+                #frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
+                #hex_frames_bytes_literal = bytes(frame_hex)
                 # Encrypt the frame
                 encrypted_bytes, _, _ = c_trivium_encrypt_file(frame_bytes, key)
                 # Send the encrypted frame
@@ -130,8 +130,8 @@ def main():
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
                 frame_bytes = cv2.imencode('.JPEG', frame)[1].tobytes()
-                # frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
-                # hex_frames_bytes_literal = bytes(frame_hex.encode())
+                #frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
+                #hex_frames_bytes_literal = bytes(frame_hex.encode())
                 # Encrypt the frame
                 encrypted_bytes, _, _ = c_salsa_encrypt_file(frame_bytes, key)
                 # Send the encrypted frame
@@ -149,17 +149,22 @@ def main():
             key = random_bytes
             # with open('key.txt', 'wb') as key_file:
             #     key_file.write(key)
-
-            key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
+            
+            key = b'\x0fB\xe8:Se\x9d~\x86\x1fy\\\x88#0\xd9'
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
                 frame_bytes = cv2.imencode('.JPEG', frame)[1].tobytes()
-                # frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
-                # hex_frames_bytes_literal = bytes(frame_hex.encode())
+                #frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
+                #hex_frames_bytes_literal = bytes(frame_hex.encode())
+
+                #with open('bird.jpeg', 'rb') as file:
+                #    plaintext = file.read()
+                    
 
                 # Encrypt the frame
                 encrypted_bytes, _, _ = c_sosemanuk_encrypt_file(frame_bytes, key)
+                #print(encrypted_bytes)
                 # Send the encrypted frame
                 connection.write(struct.pack('<L', len(encrypted_bytes)))
                 connection.flush()
@@ -173,4 +178,4 @@ def main():
 if __name__ == "__main__":
     random_key_bits, random_bytes = generate_random_key(128)
     print(random_bytes)
-    # main()
+    main()
