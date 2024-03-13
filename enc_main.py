@@ -52,6 +52,7 @@ def main():
             # with open('key.txt', 'wb') as key_file:
             #     key_file.write(key)
 
+            
             key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
             while True:
                 ret, frame = camera.read()
