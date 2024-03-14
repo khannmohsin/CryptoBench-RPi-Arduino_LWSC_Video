@@ -51,13 +51,13 @@ def c_salsa_encrypt_file(plaintext, key):
     encryption_time = end_time - start_time
 
     formatted_encryption_time = round(encryption_time, 2)
-    print(f"Encryption time: {formatted_encryption_time} seconds")
+    # print(f"Encryption time: {formatted_encryption_time} seconds")
 
     throughput = round(len_plaintext / encryption_time, 2)   # Throughput in Kbps
-    print(f"Encryption Throughput: {throughput} Kbps")
+    # print(f"Encryption Throughput: {throughput} Kbps")
 
     ram = round(avg_ram, 2)
-    print(f"Average memory usage: {ram} MB")
+    # print(f"Average memory usage: {ram} MB")
 
     return ciphertext, formatted_encryption_time, throughput, ram 
 
@@ -86,13 +86,13 @@ def c_salsa_decrypt_file(ciphertext, key):
     decryption_time = end_time - start_time
 
     formatted_decryption_time = round(decryption_time, 2)
-    print(f"Decryption time: {formatted_decryption_time} seconds")
+    # print(f"Decryption time: {formatted_decryption_time} seconds")
 
     throughput = round(len_ciphertext / decryption_time, 2)   # Throughput in Kbps
-    print(f"Decryption Throughput: {throughput} Kbps")
+    # print(f"Decryption Throughput: {throughput} Kbps")
 
     ram = round(avg_ram, 2)
-    print(f"Average memory usage: {ram} MB")
+    # print(f"Average memory usage: {ram} MB")
 
     return plaintext, formatted_decryption_time, throughput, ram
 

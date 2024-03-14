@@ -63,13 +63,13 @@ def c_trivium_encrypt_file(plaintext, key):
     encryption_time = end_time - start_time
 
     formatted_encryption_time = round(encryption_time, 2)
-    print("Total encryption time:", formatted_encryption_time, "seconds")
+    # print("Total encryption time:", formatted_encryption_time, "seconds")
 
     throughput = round(len_plaintext / encryption_time, 2)   # Throughput in Kbps
-    print("Encryption Throughput:", throughput, "Kbps")
+    # print("Encryption Throughput:", throughput, "Kbps")
 
     ram = round(avg_ram, 2)
-    print("Average memory usage:", ram, "MB")
+    # print("Average memory usage:", ram, "MB")
 
     return ciphertext, formatted_encryption_time, throughput, ram 
 
@@ -101,12 +101,12 @@ def c_trivium_decrypt_file(ciphertext, key):
 
     formatted_decryption_time = round(decryption_time, 2)
 
-    print("Total decryption time:", formatted_decryption_time, "seconds")
+    # print("Total decryption time:", formatted_decryption_time, "seconds")
 
     throughput = round(len_ciphertext / decryption_time, 2)   # Throughput in Kbps
-    print("Decryption Throughput:", throughput, "Kbps")
+    # print("Decryption Throughput:", throughput, "Kbps")
 
     ram = round(avg_ram, 2)
-    print("Average memory usage:", ram, "MB")
+    # print("Average memory usage:", ram, "MB")
 
     return plaintext, formatted_decryption_time, throughput, ram 

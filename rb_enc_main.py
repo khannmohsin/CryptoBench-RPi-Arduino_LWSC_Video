@@ -183,8 +183,8 @@ def main():
                     bcmticks_process.terminate()
                     os.system(f"kill -9 {bcmticks_process.pid}")
                     print("\n------------------------------------------------")
-                    print("A discreet time of 60 seconds has passed.")
-                    print("\nEncryption Metrics for 60 seconds: ")
+                    print("A discreet time of 10 seconds has passed.")
+                    print("\nEncryption Metrics for 10 seconds: ")
                     frame_enc_per_sec = round(frame_count / elapsed_time, 2)
                     print("Frames encrypted per second: ", frame_enc_per_sec)
 
