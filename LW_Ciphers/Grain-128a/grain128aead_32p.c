@@ -330,7 +330,6 @@ int crypto_aead_encrypt(
 	memcpy(c + mlen, &grain.acc, 8);
 
 	*clen += 8;
-	printf("ENCRYTION IS ACTUALLY DONE\n");
 	return 0;
 }
 

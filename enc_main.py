@@ -54,6 +54,8 @@ def main():
             key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
             frame_count = 0
             start_time = time.time()
+            throughput_list = []
+            ram_list = []
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -61,7 +63,7 @@ def main():
                 #frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
                 #hex_frames_bytes_literal = bytes(frame_hex.encode())
                 # Encrypt the frame
-                encrypted_bytes, _, _ = c_grain128_encrypt_file(frame_bytes, key)
+                encrypted_bytes, enc_time, enc_throughput, enc_ram = c_grain128_encrypt_file(frame_bytes, key)
                 # Send the encrypted frame
                 connection.write(struct.pack('<L', len(encrypted_bytes)))
                 connection.flush()
@@ -70,10 +72,21 @@ def main():
 
                 frame_count += 1
                 elapsed_time = time.time() - start_time
+                throughput_list.append(enc_throughput)
+                ram_list.append(enc_ram)
 
-                if elapsed_time >= 60:
-                    print("Frames encrypted in 60 seconds: ", frame_count)
+                if elapsed_time >= 10:
+                    print("Frames encrypted in 10 seconds: ", frame_count)
                     frame_count = 0
+
+                    avg_throughput = round(sum(throughput_list) / len(throughput_list))
+                    print("Average throughput: ", avg_throughput, "Kbps")
+
+                    avg_ram = round(sum(ram_list) / len(ram_list), 2)
+                    print("Average memory usage: ", avg_ram, "MB")
+
+                    throughput_list = []
+                    ram_list = []
                     start_time = time.time()
 
         elif args.algorithm == "mickey":
