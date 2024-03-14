@@ -48,12 +48,12 @@ def main():
             from cGrain128a_main import c_grain128_encrypt_file
             print("Using Grain-128a for encrypting the video stream")
             random_key_bits, random_bytes = generate_random_key(128)
-            key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
             # with open('key.txt', 'wb') as key_file:
             #     key_file.write(key)
 
-            
             key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
+            frame_count = 0
+            start_time = time.time()
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -68,6 +68,14 @@ def main():
                 connection.write(encrypted_bytes)
                 connection.flush()
 
+                frame_count += 1
+                elapsed_time = time.time() - start_time
+
+                if elapsed_time >= 60:
+                    print("Frames encrypted in 60 seconds: ", frame_count)
+                    frame_count = 0
+                    start_time = time.time()
+
         elif args.algorithm == "mickey":
             sys.path.append('LW_Ciphers/Mickey-v2')
             from cMickey_main import c_mickey_encrypt_file
@@ -78,6 +86,8 @@ def main():
             #     key_file.write(key)
             
             key = b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
+            frame_count = 0
+            start_time = time.time()
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -93,6 +103,14 @@ def main():
                 connection.write(encrypted_bytes)
                 connection.flush()
 
+                frame_count += 1
+                elapsed_time = time.time() - start_time
+
+                if elapsed_time >= 60:
+                    print("Frames encrypted in 60 seconds: ", frame_count)
+                    frame_count = 0
+                    start_time = time.time()
+
         elif args.algorithm == "trivium":
             sys.path.append('LW_Ciphers/Trivium')
             from cTRivium_main import c_trivium_encrypt_file
@@ -102,6 +120,8 @@ def main():
             # with open('key.txt', 'wb') as key_file:
             #     key_file.write(key)
 
+            frame_count = 0
+            start_time = time.time()
             key = b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
             while True:
                 ret, frame = camera.read()
@@ -117,6 +137,14 @@ def main():
                 connection.write(encrypted_bytes)
                 connection.flush()
 
+                frame_count += 1
+
+                elapsed_time = time.time() - start_time
+                if elapsed_time >= 60:
+                    print("Frames encrypted in 60 seconds: ", frame_count)
+                    frame_count = 0
+                    start_time = time.time()
+
         elif args.algorithm == "salsa":
             sys.path.append('LW_Ciphers/Salsa')
             from cSalsa_main import c_salsa_encrypt_file
@@ -127,6 +155,8 @@ def main():
             #     key_file.write(key)
 
             key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
+            frame_count = 0
+            start_time = time.time()
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -141,6 +171,14 @@ def main():
                 connection.write(encrypted_bytes)
                 connection.flush()
 
+                frame_count += 1
+                elapsed_time = time.time() - start_time
+
+                if elapsed_time >= 60:
+                    print("Frames encrypted in 60 seconds: ", frame_count)
+                    frame_count = 0
+                    start_time = time.time()
+
         elif args.algorithm == "sosemanuk":
 
             sys.path.append('LW_Ciphers/Sosemanuk')
@@ -152,6 +190,8 @@ def main():
             #     key_file.write(key)
             
             key = b'\x0fB\xe8:Se\x9d~\x86\x1fy\\\x88#0\xd9'
+            frame_count = 0
+            start_time = time.time()
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -171,6 +211,14 @@ def main():
                 connection.flush()
                 connection.write(encrypted_bytes)
                 connection.flush()
+
+                frame_count += 1
+                elapsed_time = time.time() - start_time
+
+                if elapsed_time >= 60:
+                    print("Frames encrypted in 60 seconds: ", frame_count)
+                    frame_count = 0
+                    start_time = time.time()
 
     finally:
         connection.close()
