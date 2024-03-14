@@ -1,6 +1,6 @@
 import ctypes
-import os
 import time
+import psutil
 
 # Load the shared library
 lib = ctypes.CDLL("LW_Ciphers/Salsa/ecrypt.so")  # Change the filename accordingly
@@ -45,16 +45,21 @@ def c_salsa_encrypt_file(plaintext, key):
 
     end_time = time.perf_counter()
 
+    Process = psutil.Process()
+    avg_ram = Process.memory_info().rss / 1024 / 1024
+
     encryption_time = end_time - start_time
 
     formatted_encryption_time = round(encryption_time, 2)
     print(f"Encryption time: {formatted_encryption_time} seconds")
 
     throughput = round(len_plaintext / encryption_time, 2)   # Throughput in Kbps
-
     print(f"Encryption Throughput: {throughput} Kbps")
 
-    return ciphertext, formatted_encryption_time, throughput
+    ram = round(avg_ram, 2)
+    print(f"Average memory usage: {ram} MB")
+
+    return ciphertext, formatted_encryption_time, throughput, ram 
 
 def c_salsa_decrypt_file(ciphertext, key):
 
@@ -75,16 +80,20 @@ def c_salsa_decrypt_file(ciphertext, key):
     ECRYPT_decrypt_bytes(ctypes.byref(ctx), ciphertext_buffer, plaintext, len(ciphertext))
 
     end_time = time.perf_counter()
+    Process = psutil.Process()
+    avg_ram = Process.memory_info().rss / 1024 / 1024
 
     decryption_time = end_time - start_time
 
     formatted_decryption_time = round(decryption_time, 2)
-
     print(f"Decryption time: {formatted_decryption_time} seconds")
 
     throughput = round(len_ciphertext / decryption_time, 2)   # Throughput in Kbps
-
     print(f"Decryption Throughput: {throughput} Kbps")
 
-    return plaintext, formatted_decryption_time, throughput
+    ram = round(avg_ram, 2)
+    print(f"Average memory usage: {ram} MB")
+
+    return plaintext, formatted_decryption_time, throughput, ram
+
 

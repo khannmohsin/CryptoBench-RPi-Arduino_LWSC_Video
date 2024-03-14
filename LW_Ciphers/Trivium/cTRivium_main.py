@@ -1,5 +1,6 @@
 import ctypes
 import time 
+import psutil
 
 # Define types
 u8 = ctypes.c_uint8
@@ -56,16 +57,21 @@ def c_trivium_encrypt_file(plaintext, key):
         ciphertext[i] = plaintext[i] ^ ciphertext[i]
     end_time = time.perf_counter()
 
+    Process = psutil.Process()
+    avg_ram = Process.memory_info().rss / 1024 / 1024
+
     encryption_time = end_time - start_time
 
     formatted_encryption_time = round(encryption_time, 2)
     print("Total encryption time:", formatted_encryption_time, "seconds")
 
     throughput = round(len_plaintext / encryption_time, 2)   # Throughput in Kbps
-
     print("Encryption Throughput:", throughput, "Kbps")
 
-    return ciphertext, formatted_encryption_time, throughput
+    ram = round(avg_ram, 2)
+    print("Average memory usage:", ram, "MB")
+
+    return ciphertext, formatted_encryption_time, throughput, ram 
 
 # Decryption function
 def c_trivium_decrypt_file(ciphertext, key):
@@ -88,6 +94,8 @@ def c_trivium_decrypt_file(ciphertext, key):
         plaintext[i] = ciphertext[i] ^ plaintext[i]
 
     end_time = time.perf_counter()
+    Process = psutil.Process()
+    avg_ram = Process.memory_info().rss / 1024 / 1024
 
     decryption_time = end_time - start_time
 
@@ -96,8 +104,9 @@ def c_trivium_decrypt_file(ciphertext, key):
     print("Total decryption time:", formatted_decryption_time, "seconds")
 
     throughput = round(len_ciphertext / decryption_time, 2)   # Throughput in Kbps
-
     print("Decryption Throughput:", throughput, "Kbps")
 
-    return plaintext, formatted_decryption_time, throughput
+    ram = round(avg_ram, 2)
+    print("Average memory usage:", ram, "MB")
 
+    return plaintext, formatted_decryption_time, throughput, ram 

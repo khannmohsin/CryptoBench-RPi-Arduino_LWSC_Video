@@ -65,7 +65,7 @@ def main():
                     break
                 chunk = struct.unpack('<L', chunk)[0]
                 ciphertext_bytes = connection_io.read(int(chunk))
-                decrypted_output, _, _ = c_mickey_decrypt_file(ciphertext_bytes, key)
+                decrypted_output, _, _, _ = c_mickey_decrypt_file(ciphertext_bytes, key)
                 # Deserialize the frame
                 #hex_image = decrypted_output.decode()[2:]
                 #image_bytes = bytes.fromhex(hex_image)
@@ -88,7 +88,7 @@ def main():
                     break
                 chunk = struct.unpack('<L', chunk)[0]
                 ciphertext_bytes = connection_io.read(int(chunk))
-                decrypted_output, _, _, = c_trivium_decrypt_file(ciphertext_bytes, key)
+                decrypted_output, _, _, _ = c_trivium_decrypt_file(ciphertext_bytes, key)
                 # Deserialize the frame
                 # hex_image = decrypted_output[2:]
                 # image_bytes = bytes.fromhex(hex_image)
@@ -110,7 +110,7 @@ def main():
                 chunk = connection_io.read(4)
                 chunk = struct.unpack('<L', chunk)[0]
                 ciphertext_bytes = connection_io.read(int(chunk))
-                decrypted_output, _, _, =c_salsa_decrypt_file(ciphertext_bytes, key)
+                decrypted_output, _, _, _ =c_salsa_decrypt_file(ciphertext_bytes, key)
                 # Deserialize the frame
                 # hex_image = decrypted_output.decode()[2:]
                 # image_bytes = bytes.fromhex(hex_image)
@@ -132,7 +132,7 @@ def main():
                 chunk = struct.unpack('<L', chunk)[0]
                 ciphertext_bytes = connection_io.read(chunk)
                 print("Ciphertext_bytes: ", chunk)
-                decrypted_output, _, _ = c_sosemanuk_decrypt_file(ciphertext_bytes, key)
+                decrypted_output, _, _, _ = c_sosemanuk_decrypt_file(ciphertext_bytes, key)
                 print("Decrypted Output: ", decrypted_output[:4])
                 # Deserialize the frame
                 # hex_image = decrypted_output.decode()[2:]
