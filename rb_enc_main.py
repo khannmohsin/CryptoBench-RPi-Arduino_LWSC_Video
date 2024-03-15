@@ -8,6 +8,7 @@ import argparse
 import sys
 import os
 import subprocess
+import csv
 
 Server_IP = '10.239.159.182'
 Server_Port = 8000
@@ -33,6 +34,10 @@ avg_cpu_cycles = avg_cpu_cycles[1:]
 avg_cpu_cycles = sum(avg_cpu_cycles)/len(avg_cpu_cycles)
 
 os.remove('output.txt')
+
+
+
+
 
 def generate_random_key(num_bits):
     # Generate a random byte array of appropriate length
