@@ -156,7 +156,7 @@ def main():
                     frame_enc_per_sec = round(frame_count / elapsed_time, 2)
                     print("Frames encrypted per second: ", frame_enc_per_sec)
 
-                    avg_throughput = round(sum(throughput_list) / len(throughput_list))
+                    avg_throughput = round(sum(throughput_list) / len(throughput_list), 2)
                     print("Average throughput: ", avg_throughput, "Kbps")
 
                     avg_ram = round(sum(ram_list) / len(ram_list), 2)
