@@ -10,6 +10,7 @@ import sys
 Server_IP = '10.239.148.76'
 Server_Port = 8000
 
+
 def generate_random_key(num_bits):
     # Generate a random byte array of appropriate length
     num_bytes = (num_bits + 7) // 8  # Round up to the nearest whole number of bytes

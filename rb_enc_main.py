@@ -35,9 +35,47 @@ avg_cpu_cycles = sum(avg_cpu_cycles)/len(avg_cpu_cycles)
 
 os.remove('output.txt')
 
+def save_to_csv(algorithm, key_size, frame_enc_per_sec, avg_throughput, avg_ram, cycles_per_byte):
+    headers = ["Algorithm", "Key Size", "Frames Encrypted Per Second", "Average Throughput", "Average RAM", "Cycles Per Byte"]
+    enc_frames_per_sec_filename = 'Measurements/enc_frames_per_sec.csv'
+    enc_throughput_filename = 'Measurements/enc_throughput.csv'
+    enc_ram_filename = 'Measurements/enc_ram.csv'
+    enc_cycles_per_byte_filename = 'Measurements/enc_cycles_per_byte.csv'
 
+    update_csv_data(enc_frames_per_sec_filename, algorithm, key_size, frame_enc_per_sec)
 
+    update_csv_data(enc_throughput_filename, algorithm, key_size, avg_throughput)
 
+    update_csv_data(enc_ram_filename, algorithm, key_size, avg_ram)
+
+    update_csv_data(enc_cycles_per_byte_filename, algorithm, key_size, cycles_per_byte)
+
+def update_csv_data(filename, algorithm, key_size, value):
+    if not os.path.isfile(filename):
+        with open(filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Algorithm", "Key Size", "Value"])
+
+    with open(filename, 'r', newline='') as file:
+        reader = csv.reader(file)
+        data = list(reader)
+        algorithm_exists = False
+        for row in data[1:]:
+            if row[0] == algorithm and row[1] == str(key_size):
+                algorithm_exists = True
+                row.append(value)
+                break   
+
+        if not algorithm_exists:
+            with open(filename, 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([algorithm, key_size, value])
+
+        else:
+            with open(filename, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['Algorithm', 'Key Size', 'Value'])
+                writer.writerows(data[1:])
 
 def generate_random_key(num_bits):
     # Generate a random byte array of appropriate length
@@ -136,6 +174,8 @@ def main():
 
                     print("Average CPU cycles per byte: ", cycles_per_byte, "CpB")
 
+                    save_to_csv(args.algorithm, "128", frame_enc_per_sec, avg_throughput, avg_ram, cycles_per_byte)
+
                     frame_count = 0
                     throughput_list = []
                     ram_list = []
@@ -211,6 +251,8 @@ def main():
 
                     print("Average CPU cycles per byte: ", cycles_per_byte, "CpB")
 
+                    save_to_csv(args.algorithm, "80", frame_enc_per_sec, avg_throughput, avg_ram, cycles_per_byte)
+
                     frame_count = 0
                     throughput_list = []
                     ram_list = []
@@ -285,6 +327,8 @@ def main():
 
                     print("Average CPU cycles per byte: ", cycles_per_byte, "CpB")
 
+                    save_to_csv(args.algorithm, "80", frame_enc_per_sec, avg_throughput, avg_ram, cycles_per_byte)
+
                     frame_count = 0
                     throughput_list = []
                     ram_list = []
@@ -358,6 +402,8 @@ def main():
                     cycles_per_byte = int(cycles_per_byte)
 
                     print("Average CPU cycles per byte: ", cycles_per_byte, "CpB")
+
+                    save_to_csv(args.algorithm, "128", frame_enc_per_sec, avg_throughput, avg_ram, cycles_per_byte)
 
                     frame_count = 0
                     throughput_list = []
@@ -439,6 +485,8 @@ def main():
                     cycles_per_byte = int(cycles_per_byte)
 
                     print("Average CPU cycles per byte: ", cycles_per_byte, "CpB")
+
+                    save_to_csv(args.algorithm, "128", frame_enc_per_sec, avg_throughput, avg_ram, cycles_per_byte)
 
                     frame_count = 0
                     throughput_list = []
