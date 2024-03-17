@@ -94,7 +94,7 @@ def generate_random_key(num_bits):
 
 def main():
     parser = argparse.ArgumentParser(description="Encrypt video streams using different cryptographic algorithms")
-    parser.add_argument("algorithm", help="The cryptographic algorithm to use", choices=["grain-128a", "mickey", "trivium", "salsa", "sosemanuk"])
+    parser.add_argument("algorithm", help="The cryptographic algorithm to use", choices=["grain-128a", "grain-v1", "mickey", "trivium", "salsa", "sosemanuk"])
 
     args = parser.parse_args()
 
@@ -182,6 +182,82 @@ def main():
                     cycle_count_enc = []
                     total_frame_bytes = 0
                     os.remove('output.txt')                   
+                    bcmticks_process = subprocess.Popen(["./first_cycles"])
+                    start_time = time.time()
+
+        elif args.algorithm == "grain-v1":
+            sys.path.append('LW_Ciphers/Grain-v1')
+            from cGrain_main import c_grain_v1_encrypt_file
+            print("------------------------------------------------")
+            print("Using Grain-v1 for encrypting the video stream")
+            random_key_bits, random_bytes = generate_random_key(80)
+            key = random_bytes
+            # with open('key.txt', 'wb') as key_file:
+            #     key_file.write(key)
+
+            key = b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
+            frame_count = 0
+            start_time = time.time()
+            throughput_list = []
+            ram_list = []
+            cycle_count_enc = []
+            total_frame_bytes = 0
+            bcmticks_process = subprocess.Popen(["./first_cycles"])
+            while True:
+                ret, frame = camera.read()
+                frame = cv2.resize(frame, (640, 480))
+                frame_bytes = cv2.imencode('.JPEG', frame)[1].tobytes()
+                #frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
+                #hex_frames_bytes_literal = bytes(frame_hex.encode())
+                # Encrypt the frame
+                encrypted_bytes, enc_time, enc_throughput, enc_ram = c_grain_v1_encrypt_file(frame_bytes, key)
+                # Send the encrypted frame
+                connection.write(struct.pack('<L', len(encrypted_bytes)))
+                connection.flush()
+                connection.write(encrypted_bytes)
+                connection.flush()
+
+                frame_count += 1
+                elapsed_time = time.time() - start_time
+                throughput_list.append(enc_throughput)
+                ram_list.append(enc_ram)
+                total_frame_bytes += len(frame_bytes)
+
+                if elapsed_time >= 10:
+                    bcmticks_process.terminate()
+                    os.system(f"kill -9 {bcmticks_process.pid}")
+                    print("\n------------------------------------------------")
+                    print("A discreet time of 10 seconds has passed.")
+                    print("\nEncryption Metrics for 10 seconds: ")
+                    frame_enc_per_sec = round(frame_count / elapsed_time, 2)
+                    print("Frames encrypted per second: ", frame_enc_per_sec)
+
+                    avg_throughput = round(sum(throughput_list) / len(throughput_list))
+                    print("Average throughput: ", avg_throughput, "Kbps")
+
+                    avg_ram = round(sum(ram_list) / len(ram_list), 2)
+                    print("Average memory usage: ", avg_ram, "MB")
+
+                    with open ('output.txt', 'r') as file:
+                        lines = file.readlines()
+                    for line in lines:
+                        line = line.strip()
+                        cycle_count_enc.append(int(line))
+
+                    cycle_count_enc = [x - int(avg_cpu_cycles) for x in cycle_count_enc]
+                    cycles_per_byte = sum(cycle_count_enc) / total_frame_bytes
+                    cycles_per_byte = int(cycles_per_byte)
+
+                    print("Average CPU cycles per byte: ", cycles_per_byte, "CpB")
+
+                    save_to_csv(args.algorithm, "80", frame_enc_per_sec, avg_throughput, avg_ram, cycles_per_byte)
+
+                    frame_count = 0
+                    throughput_list = []
+                    ram_list = []
+                    cycle_count_enc = []
+                    total_frame_bytes = 0
+                    os.remove('output.txt')
                     bcmticks_process = subprocess.Popen(["./first_cycles"])
                     start_time = time.time()
 
@@ -425,7 +501,7 @@ def main():
             # with open('key.txt', 'wb') as key_file:
             #     key_file.write(key)
             
-            key = b'\x0fB\xe8:Se\x9d~\x86\x1fy\\\x88#0\xd9'
+            key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
             frame_count = 0
             start_time = time.time()
             throughput_list = []
@@ -448,7 +524,7 @@ def main():
                 encrypted_bytes, enc_time, enc_throughput, enc_ram = c_sosemanuk_encrypt_file(frame_bytes, key)
                 #print(encrypted_bytes)
                 # Send the encrypted frame
-                connection.write(struct.pack('<L', len(encrypted_bytes)))
+                connection.write(struct.pack('>L', len(encrypted_bytes)))
                 connection.flush()
                 connection.write(encrypted_bytes)
                 connection.flush()

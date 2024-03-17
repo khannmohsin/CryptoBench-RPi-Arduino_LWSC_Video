@@ -4,6 +4,7 @@
         "./LW_Ciphers/Mickey-v2",
         "./LW_Ciphers/Trivium",
         "./LW_Ciphers/Salsa",
-        "./LW_Ciphers/Sosemanuk"
+        "./LW_Ciphers/Sosemanuk",
+        "./LW_Ciphers/Grain-v1"
     ]
 }

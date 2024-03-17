@@ -12,9 +12,9 @@ import csv
 
 def save_to_csv(algorithm, key_size, frame_dec_per_sec, avg_throughput, avg_ram):
     headers = ["Algorithm", "Key Size", "Frames Decrypted Per Second", "Average Throughput", "Average RAM"]
-    enc_frames_per_sec_filename = 'Measurements/enc_frames_per_sec.csv'
-    enc_throughput_filename = 'Measurements/enc_throughput.csv'
-    enc_ram_filename = 'Measurements/enc_ram.csv'
+    enc_frames_per_sec_filename = 'Measurements/dec_frames_per_sec.csv'
+    enc_throughput_filename = 'Measurements/dec_throughput.csv'
+    enc_ram_filename = 'Measurements/dec_ram.csv'
 
     update_csv_data(enc_frames_per_sec_filename, algorithm, key_size, frame_dec_per_sec)
 
@@ -52,7 +52,7 @@ def update_csv_data(filename, algorithm, key_size, value):
 
 def main():
     parser = argparse.ArgumentParser(description="Decrypt video streams using different cryptographic algorithms")
-    parser.add_argument("algorithm", help="The cryptographic algorithm to use", choices=["grain-128a", "mickey", "trivium", "salsa", "sosemanuk"])
+    parser.add_argument("algorithm", help="The cryptographic algorithm to use", choices=["grain-128a", "grain-v1", "mickey", "trivium", "salsa", "sosemanuk"])
 
     args = parser.parse_args()
 
@@ -125,6 +125,64 @@ def main():
                     total_frame_bytes = 0
                     start_time = time.time()
 
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+        elif args.algorithm == "grain-v1":
+            sys.path.append('LW_Ciphers/Grain-v1')
+            from cGrain_main import c_grain_v1_decrypt_file
+            print("------------------------------------------------")
+            print("Using Grain-v1 for decrypting the video stream")
+            # with open('key.txt', 'rb') as key_file:
+            #     key = key_file.read()
+
+            key = b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
+            frame_count = 0
+            start_time = time.time()
+            throughput_list = []
+            ram_list = []
+            total_frame_bytes = 0
+            while True:
+                chunk = connection_io.read(4)
+                if not chunk:
+                    break
+                chunk = struct.unpack('<L', chunk)[0]
+                ciphertext_bytes = connection_io.read(int(chunk))
+                decrypted_output, dec_time, dec_throughput, dec_ram = c_grain_v1_decrypt_file(ciphertext_bytes, key)
+                # Deserialize the frame
+                #hex_image = decrypted_output.decode()[2:]
+                #image_bytes = bytes.fromhex(hex_image)
+                frame = cv2.imdecode(np.frombuffer(decrypted_output, np.uint8), cv2.IMREAD_COLOR)
+                cv2.imshow('frame', frame)
+
+                frame_count += 1
+                elapsed_time = time.time() - start_time
+                throughput_list.append(dec_throughput)
+                ram_list.append(dec_ram)
+                total_frame_bytes += len(ciphertext_bytes)
+
+                if elapsed_time >= 10:
+                    print("\n------------------------------------------------")
+                    print("A discreet time of 10 seconds has passed")
+                    print("\nDecryption metrics for 10 seconds:")
+
+                    frame_dec_per_sec = round(frame_count / elapsed_time, 2)
+                    print(f"Frames decrypted per second: {frame_dec_per_sec}")
+
+                    avg_throughput = round(sum(throughput_list) / len(throughput_list), 2)
+                    print(f"Average throughput: {avg_throughput} Kbps")
+
+                    avg_ram = round(sum(ram_list) / len(ram_list), 2)
+                    print(f"Average memory usage: {avg_ram} MB")
+
+                    save_to_csv(args.algorithm, "80", frame_dec_per_sec, avg_throughput, avg_ram)
+
+                    frame_count = 0
+                    throughput_list = []
+                    ram_list = []
+                    total_frame_bytes = 0
+                    start_time = time.time()
+                    
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
 
@@ -309,10 +367,15 @@ def main():
             # with open('key.txt', 'rb') as key_file:
             #     key = key_file.read()
 
-            key = b'\x0fB\xe8:Se\x9d~\x86\x1fy\\\x88#0\xd9'
+            key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
+            frame_count = 0
+            start_time = time.time()
+            throughput_list = []
+            ram_list = []
+            total_frame_bytes = 0
             while True:
                 chunk = connection_io.read(4)
-                chunk = struct.unpack('<L', chunk)[0]
+                chunk = struct.unpack('>L', chunk)[0]
                 ciphertext_bytes = connection_io.read(chunk)
                 decrypted_output, dec_time, dec_throughput, dec_ram = c_sosemanuk_decrypt_file(ciphertext_bytes, key)
                 # Deserialize the frame

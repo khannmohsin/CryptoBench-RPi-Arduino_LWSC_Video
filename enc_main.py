@@ -28,7 +28,7 @@ def generate_random_key(num_bits):
 
 def main():
     parser = argparse.ArgumentParser(description="Encrypt video streams using different cryptographic algorithms")
-    parser.add_argument("algorithm", help="The cryptographic algorithm to use", choices=["grain-128a", "mickey", "trivium", "salsa", "sosemanuk"])
+    parser.add_argument("algorithm", help="The cryptographic algorithm to use", choices=["grain-128a", "grain-v1", "mickey", "trivium", "salsa", "sosemanuk"])
 
     args = parser.parse_args()
 
@@ -89,6 +89,41 @@ def main():
                     throughput_list = []
                     ram_list = []
                     start_time = time.time()
+
+        elif args.algorithm == "grain-v1":
+            sys.path.append('LW_Ciphers/Grain-v1')
+            from cGrain_main import c_grain_v1_encrypt_file
+            print("Using Grain-v1 for encrypting the video stream")
+            random_key_bits, random_bytes = generate_random_key(80)
+            key = random_bytes
+            # with open('key.txt', 'wb') as key_file:
+            #     key_file.write(key)
+
+            key = b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
+            frame_count = 0
+            start_time = time.time()
+            while True:
+                ret, frame = camera.read()
+                frame = cv2.resize(frame, (640, 480))
+                frame_bytes = cv2.imencode('.JPEG', frame)[1].tobytes()
+                #frame_hex = '0x' + ''.join(format(byte, '02x') for byte in frame_bytes)
+                #hex_frames_bytes_literal = bytes(frame_hex.encode())
+                # Encrypt the frame
+                encrypted_bytes, _, _ = c_grain_v1_encrypt_file(frame_bytes, key)
+                # Send the encrypted frame
+                connection.write(struct.pack('<L', len(encrypted_bytes)))
+                connection.flush()
+                connection.write(encrypted_bytes)
+                connection.flush()
+
+                frame_count += 1
+                elapsed_time = time.time() - start_time
+
+                if elapsed_time >= 60:
+                    print("Frames encrypted in 60 seconds: ", frame_count)
+                    frame_count = 0
+                    start_time = time.time()
+
 
         elif args.algorithm == "mickey":
             sys.path.append('LW_Ciphers/Mickey-v2')
