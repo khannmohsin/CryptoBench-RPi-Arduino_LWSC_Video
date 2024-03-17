@@ -122,6 +122,7 @@ def main():
             key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
             frame_count = 0
             start_time = time.time()
+            initial_start_time = time.time()
             throughput_list = []
             ram_list = []
             cycle_count_enc = []
@@ -143,6 +144,7 @@ def main():
 
                 frame_count += 1
                 elapsed_time = time.time() - start_time
+                elapsed_time_initial = time.time() - initial_start_time
                 throughput_list.append(enc_throughput)
                 ram_list.append(enc_ram)
                 total_frame_bytes += len(frame_bytes)
@@ -184,6 +186,14 @@ def main():
                     os.remove('output.txt')                   
                     bcmticks_process = subprocess.Popen(["./first_cycles"])
                     start_time = time.time()
+                
+                elif elapsed_time_initial>=300:
+                    print("Total time of 5 minutes has passed. Closing the connection and releasing the camera.")
+                    os.remove('output.txt')
+                    camera.release()
+                    connection.close()
+                    client_socket.close()
+                    sys.exit()
 
         elif args.algorithm == "grain-v1":
             sys.path.append('LW_Ciphers/Grain-v1')
@@ -198,6 +208,7 @@ def main():
             key = b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
             frame_count = 0
             start_time = time.time()
+            elapsed_time_initial = time.time()
             throughput_list = []
             ram_list = []
             cycle_count_enc = []
@@ -219,6 +230,7 @@ def main():
 
                 frame_count += 1
                 elapsed_time = time.time() - start_time
+                elapsed_time_initial = time.time() - start_time
                 throughput_list.append(enc_throughput)
                 ram_list.append(enc_ram)
                 total_frame_bytes += len(frame_bytes)
@@ -261,6 +273,14 @@ def main():
                     bcmticks_process = subprocess.Popen(["./first_cycles"])
                     start_time = time.time()
 
+                elif elapsed_time_initial>=300:
+                    print("Total time of 5 minutes has passed. Closing the connection and releasing the camera.")
+                    os.remove('output.txt')
+                    camera.release()
+                    connection.close()
+                    client_socket.close()
+                    sys.exit()
+
         elif args.algorithm == "mickey":
             sys.path.append('LW_Ciphers/Mickey-v2')
             from cMickey_main import c_mickey_encrypt_file
@@ -274,6 +294,7 @@ def main():
             key = b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
             frame_count = 0
             start_time = time.time()
+            start_time_initial = time.time()
             throughput_list = []
             ram_list = []
             cycle_count_enc = []
@@ -296,6 +317,7 @@ def main():
 
                 frame_count += 1
                 elapsed_time = time.time() - start_time
+                elapsed_time_initial = time.time() - start_time_initial
                 throughput_list.append(enc_throughput)
                 ram_list.append(enc_ram)
                 total_frame_bytes += len(frame_bytes)
@@ -338,6 +360,14 @@ def main():
                     bcmticks_process = subprocess.Popen(["./first_cycles"])
                     start_time = time.time()
 
+                elif elapsed_time_initial>=300:
+                    print("Total time of 5 minutes has passed. Closing the connection and releasing the camera.")
+                    os.remove('output.txt')
+                    camera.release()
+                    connection.close()
+                    client_socket.close()
+                    sys.exit()
+
         elif args.algorithm == "trivium":
             sys.path.append('LW_Ciphers/Trivium')
             from cTRivium_main import c_trivium_encrypt_file
@@ -351,6 +381,7 @@ def main():
             key = b'\x03\x0e\x8d\xfd\xb13v\x88\xae\xff'
             frame_count = 0
             start_time = time.time()
+            start_time_initial = time.time()
             throughput_list = []
             ram_list = []
             cycle_count_enc = []
@@ -372,6 +403,7 @@ def main():
 
                 frame_count += 1
                 elapsed_time = time.time() - start_time
+                elapsed_time_initial = time.time() - start_time_initial
                 throughput_list.append(enc_throughput)
                 ram_list.append(enc_ram)
                 total_frame_bytes += len(frame_bytes)
@@ -414,6 +446,14 @@ def main():
                     bcmticks_process = subprocess.Popen(["./first_cycles"])
                     start_time = time.time()
 
+                elif elapsed_time_initial>=300:
+                    print("Total time of 5 minutes has passed. Closing the connection and releasing the camera.")
+                    os.remove('output.txt')
+                    camera.release()
+                    connection.close()
+                    client_socket.close()
+                    sys.exit()
+
         elif args.algorithm == "salsa":
             sys.path.append('LW_Ciphers/Salsa')
             from cSalsa_main import c_salsa_encrypt_file
@@ -427,6 +467,7 @@ def main():
             key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
             frame_count = 0
             start_time = time.time()
+            start_time_initial = time.time()
             throughput_list = []
             ram_list = []
             cycle_count_enc = []
@@ -448,6 +489,7 @@ def main():
 
                 frame_count += 1
                 elapsed_time = time.time() - start_time
+                elapsed_time_initial = time.time() - start_time_initial
                 throughput_list.append(enc_throughput)
                 ram_list.append(enc_ram)
                 total_frame_bytes += len(frame_bytes)
@@ -490,6 +532,14 @@ def main():
                     bcmticks_process = subprocess.Popen(["./first_cycles"])
                     start_time = time.time()
 
+                elif elapsed_time_initial>=300:
+                    print("Total time of 5 minutes has passed. Closing the connection and releasing the camera.")
+                    os.remove('output.txt')
+                    camera.release()
+                    connection.close()
+                    client_socket.close()
+                    sys.exit()
+
         elif args.algorithm == "sosemanuk":
 
             sys.path.append('LW_Ciphers/Sosemanuk')
@@ -504,6 +554,7 @@ def main():
             key = b'\x9a`\x94cn5\x13\xbc\xd0\\Q\xa3\x8f\x07\xd0\xa0'
             frame_count = 0
             start_time = time.time()
+            start_time_initial = time.time()
             throughput_list = []
             ram_list = []
             cycle_count_enc = []
@@ -531,6 +582,7 @@ def main():
 
                 frame_count += 1
                 elapsed_time = time.time() - start_time
+                elapsed_time_initial = time.time() - start_time_initial
                 throughput_list.append(enc_throughput)
                 ram_list.append(enc_ram)
                 total_frame_bytes += len(frame_bytes)
@@ -572,6 +624,14 @@ def main():
                     os.remove('output.txt')
                     bcmticks_process = subprocess.Popen(["./first_cycles"])
                     start_time = time.time()
+
+                elif elapsed_time_initial>=300:
+                    print("Total time of 5 minutes has passed. Closing the connection and releasing the camera.")
+                    os.remove('output.txt')
+                    camera.release()
+                    connection.close()
+                    client_socket.close()
+                    sys.exit()
 
 
     except KeyboardInterrupt:
