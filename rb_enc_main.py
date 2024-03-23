@@ -10,7 +10,7 @@ import os
 import subprocess
 import csv
 
-Server_IP = '10.239.159.182'
+Server_IP = '192.168.1.43'
 Server_Port = 8000
 
 avg_cpu_cycles = []

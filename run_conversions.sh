@@ -1,6 +1,9 @@
 # -----------------C compilation of GRAIN CIPHER -----------------
 gcc -fPIC -shared -o LW_Ciphers/Grain-128a/grain128aead_32p.so LW_Ciphers/Grain-128a/grain128aead_32p.c
 
+# -----------------C compilation of GRAIN-v1 CIPHER -----------------
+gcc -fPIC -shared -o LW_Ciphers/Grain-v1/grain.so LW_Ciphers/Grain-v1/grain.c
+
 # -----------------C compilation of MICKEY-v2 CIPHER -----------------
 gcc -fPIC -shared -o LW_Ciphers/Mickey-v2/mickey2.so LW_Ciphers/Mickey-v2/mickey2.c
 

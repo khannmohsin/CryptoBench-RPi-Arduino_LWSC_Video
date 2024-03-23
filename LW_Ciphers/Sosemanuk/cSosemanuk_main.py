@@ -4,7 +4,7 @@ import psutil
 import os
 
 # Load the shared library
-lib = ctypes.CDLL("LW_Stream_Cipher/eSTREAM/SW_oriented/Sosemanuk/c_imp/sosemanuk.so")  # Change the filename accordingly
+lib = ctypes.CDLL("LW_Ciphers/Sosemanuk/sosemanuk.so")  # Change the filename accordingly
 
 u8 = ctypes.c_uint8
 u32 = ctypes.c_uint32
@@ -37,6 +37,7 @@ ECRYPT_process_bytes.argtypes = [ctypes.c_int, ctypes.POINTER(ECRYPT_ctx), ctype
 def c_sosemanuk_encrypt_file(plaintext, key):
     ctx = ECRYPT_ctx()
     len_plaintext = len(plaintext)
+    file_size_Kb = len_plaintext * 8 / 1000
 
     key = (u8 * 16)(*key)
     iv = (u8 * 16)(11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26)  # Example IV
@@ -61,13 +62,13 @@ def c_sosemanuk_encrypt_file(plaintext, key):
     encryption_time = end_time - start_time
 
     formatted_encryption_time = round(encryption_time, 2)
-    print("Total encryption time:", formatted_encryption_time, "seconds")
+    #print("Total encryption time:", formatted_encryption_time, "seconds")
 
-    throughput = round(len_plaintext / encryption_time, 2)   # Throughput in Kbps
-    print("Encryption Throughput:", throughput, "Kbps")
+    throughput = round(file_size_Kb / encryption_time, 2)   # Throughput in Kbps
+    #print("Encryption Throughput:", throughput, "Kbps")
 
     ram = round(avg_ram, 2)
-    print("Average memory usage:", ram, "MB")
+    #print("Average memory usage:", ram, "MB")
 
     return ciphertext, formatted_encryption_time, throughput, ram
 
@@ -76,6 +77,7 @@ def c_sosemanuk_decrypt_file(ciphertext, key):
     ctx = ECRYPT_ctx()
 
     len_ciphertext = len(ciphertext)
+    file_size_Kb = len_ciphertext * 8 / 1000
 
     key = (u8 * 16)(*key)
     iv = (u8 * 16)(11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26)  # Example IV
@@ -100,13 +102,13 @@ def c_sosemanuk_decrypt_file(ciphertext, key):
     decryption_time = end_time - start_time
 
     formatted_decryption_time = round(decryption_time, 2)
-    print("Total decryption time:", formatted_decryption_time, "seconds")
+    #print("Total decryption time:", formatted_decryption_time, "seconds")
 
-    throughput = round(len_ciphertext / decryption_time, 2)   # Throughput in Kbps
-    print("Decryption Throughput:", throughput, "Kbps")
+    throughput = round(file_size_Kb / decryption_time, 2)   # Throughput in Kbps
+    #print("Decryption Throughput:", throughput, "Kbps")
 
     ram = round(avg_ram, 2)
-    print("Average memory usage:", ram, "MB")
+    #print("Average memory usage:", ram, "MB")
 
     
     return plaintext, formatted_decryption_time, throughput, ram

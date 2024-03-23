@@ -44,6 +44,7 @@ def c_grain128_encrypt_file(plaintext, key):
 
     len_key = len(key)
     len_plaintext = len(plaintext)
+    file_size_Kb = len_plaintext * 8 / 1000
 
     hex_image_bytes_literal = plaintext
 
@@ -92,7 +93,7 @@ def c_grain128_encrypt_file(plaintext, key):
 
         #print("Total encryption time:", formatted_encryption_time, "seconds")
 
-        throughput = round(len_plaintext / encryption_time, 2)   # Throughput in Kbps
+        throughput = round(file_size_Kb / encryption_time, 2)   # Throughput in Kbps
 
         #print("Encryption Throughput:", throughput, "Kbps")
 
@@ -109,6 +110,7 @@ def c_grain128_decrypt_file(ciphertext, key):
 
     len_key = len(key)
     len_ciphertext = len(ciphertext)
+    file_size_Kb = len_ciphertext * 8 / 1000
     
     k_buffer = ctypes.create_string_buffer(key)
     k_ptr = ctypes.cast(k_buffer, ctypes.POINTER(ctypes.c_ubyte))
@@ -154,7 +156,7 @@ def c_grain128_decrypt_file(ciphertext, key):
 
         # print("Total decryption time:", formatted_decryption_time, "seconds")
 
-        throughput = round(len_ciphertext / decryption_time, 2)   # Throughput in Kbps
+        throughput = round(file_size_Kb / decryption_time, 2)   # Throughput in Kbps
         # print("Decryption Throughput:", throughput)
 
         ram = round(avg_ram, 2)
