@@ -41,11 +41,13 @@ libgrain.ECRYPT_decrypt_bytes.argtypes = [ctypes.POINTER(ECRYPT_ctx),
                                           ctypes.POINTER(ctypes.c_uint8),
                                           ctypes.c_uint32]
 
+ctx = ECRYPT_ctx()
+
 # Helper functions
 def c_grain_v1_encrypt_file(plaintext, key):
     len_plaintext = len(plaintext)
     file_size_Kb = len_plaintext * 8 / 1000
-    ctx = ECRYPT_ctx()
+    # ctx = ECRYPT_ctx()
 
     key_ptr = (ctypes.c_uint8 * len(key))(*key)
     iv = (ctypes.c_uint8 * 8)(11, 12, 13, 14, 15, 16, 17, 18)
@@ -82,7 +84,7 @@ def c_grain_v1_encrypt_file(plaintext, key):
 def c_grain_v1_decrypt_file(ciphertext, key):
     len_ciphertext = len(ciphertext)
     file_size_Kb = len_ciphertext * 8 / 1000
-    ctx = ECRYPT_ctx()
+    # ctx = ECRYPT_ctx()
 
     key_ptr = (ctypes.c_uint8 * len(key))(*key)
     iv = (ctypes.c_uint8 * 8)(11, 12, 13, 14, 15, 16, 17, 18)
