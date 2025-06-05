@@ -37,6 +37,10 @@ These are either finalists of the eSTREAM project or optimized versions used in 
 
 **Power Measurement**: Controlled via GPIO signaling from Pi to Arduino to capture cipher-specific energy data per frame.
 
+![Energy Measurement Circuit Diagram](Manuscript/Schematics_curr_power_measurement.pdf)
+
+[View Energy Measurement Circuit Diagram (PDF)](Manuscript/Schematics_curr_power_measurement.pdf)
+
 ## Installation & Setup
 
 ### On Raspberry Pi (Client)
@@ -121,8 +125,6 @@ See the `LICENSE` file in the root of the repository for more details.
 ## Academic Reference
 
 If you use this codebase in your work, please consider citing the following:
-
-This repository serves as the code companion to the paper:
 
 **Citation**:  
 Khan, M.; Dagenborg, H.; Johansen, D.  
