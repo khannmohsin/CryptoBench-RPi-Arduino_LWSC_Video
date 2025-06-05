@@ -390,7 +390,7 @@ def main():
                 ram_list.append(dec_ram)
                 total_frame_bytes += len(ciphertext_bytes)
 
-                if elapsed_time >= 10:
+                if elapsed_time >= 30:
                     print("\n------------------------------------------------")
                     print("A discreet time of 10 seconds has passed")
                     print("\nDecryption metrics for 10 seconds:")

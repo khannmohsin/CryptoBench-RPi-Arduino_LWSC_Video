@@ -1,6 +1,8 @@
 import ctypes
 import time 
 import psutil
+import os 
+import subprocess
 
 # Define types
 u8 = ctypes.c_uint8
@@ -40,12 +42,28 @@ ECRYPT_process_bytes.restype = None
 # Initialize the library
 ECRYPT_init()
 
+def get_memory_usage():
+    """Get the current memory usage of the process.
 
-# Encryption function
+    Returns:
+    int: The memory usage in bytes.
+    """
+    process = subprocess.Popen("ps -p %d -o rss | tail -n 1" % os.getpid(), shell=True, stdout=subprocess.PIPE)
+    out, _ = process.communicate()
+    memory = int(out.strip()) * 1024  # Convert from KB to bytes
+    return memory
+
 def c_mickey_encrypt_file(plaintext, key):
 
     len_plaintext = len(plaintext)
-    file_size_Kb = len_plaintext * 8 / 1000
+    # print("Length of frame:", len_plaintext)
+    file_size_Kb = len_plaintext * 8 / 1000  # File size in Kilobits
+
+    # pid = os.getpid()
+    # print("PID:", pid)
+    # start_memory = get_memory_usage_proc(pid)
+
+    memory_before = get_memory_usage()
 
     ctx = ECRYPT_ctx()
     key = (u8 * 10)(*key)
@@ -54,8 +72,8 @@ def c_mickey_encrypt_file(plaintext, key):
     ECRYPT_ivsetup(ctypes.byref(ctx), iv)
  
     keystream = (u8 * len(plaintext))()
-    ciphertext = bytearray(len(plaintext))
 
+    ciphertext = bytearray(len(plaintext))
     start_time = time.perf_counter()
     ECRYPT_keystream_bytes(ctypes.byref(ctx), keystream, len(plaintext))
 
@@ -63,21 +81,27 @@ def c_mickey_encrypt_file(plaintext, key):
         ciphertext[i] = plaintext[i] ^ keystream[i]
 
     end_time = time.perf_counter()
-    Process = psutil.Process()
-    avg_ram = Process.memory_info().rss / 1024 / 1024
+    memory_after = get_memory_usage()
+
+    # end_memory = get_memory_usage_proc(pid)
 
     encryption_time = end_time - start_time
 
     formatted_encryption_time = round(encryption_time, 2)
-    #print("Total encryption time:", formatted_encryption_time, "seconds")
+    # print("Total encryption time:", formatted_encryption_time, "seconds")
 
     throughput = round(file_size_Kb / encryption_time, 2)   # Throughput in Kbps
-    #print("Encryption Throughput:", throughput, "Kbps")
+    # print("Encryption Throughput:", throughput, "Kbps")
 
-    ram = round(avg_ram, 2)
-    #print("Average memory usage:", ram, "MB")
+    memory_consumption = round((memory_after), 2)
+    memory_footprint = round((memory_after)/len_plaintext, 2)
+    # print("Memory usage:", memory_consumption, "bytes")
+    # print("Memory footprint:", memory_footprint, "bytes per byte of plaintext")
 
-    return ciphertext, formatted_encryption_time, throughput, ram
+    # memory_consumption = end_memory - start_memory
+    # print("Memory usage:", memory_consumption, "bytes")
+
+    return ciphertext, formatted_encryption_time, throughput, memory_footprint
 
 # Decryption function
 def c_mickey_decrypt_file(ciphertext, key):

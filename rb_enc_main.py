@@ -9,8 +9,10 @@ import sys
 import os
 import subprocess
 import csv
+import serial
 
-Server_IP = '192.168.1.43'
+arduino_serial = serial.Serial(port='/dev/ttyAMA0', baudrate=9600, timeout=.1)
+Server_IP = '10.239.152.0'
 Server_Port = 8000
 
 avg_cpu_cycles = []
@@ -111,6 +113,7 @@ def main():
         time.sleep(2) 
 
         if args.algorithm == "grain-128a":
+            algo_name = args.algorithm + "_enc"  # Name of the algorithm
             sys.path.append('LW_Ciphers/Grain-128a')
             from cGrain128a_main import c_grain128_encrypt_file
             print("------------------------------------------------")
@@ -128,6 +131,7 @@ def main():
             cycle_count_enc = []
             total_frame_bytes = 0
             bcmticks_process = subprocess.Popen(["./first_cycles"])
+            arduino_serial.write(bytes(algo_name, 'utf-8'))
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -152,6 +156,7 @@ def main():
                 if elapsed_time >= 10:
                     bcmticks_process.terminate()
                     os.system(f"kill -9 {bcmticks_process.pid}")
+                    arduino_serial.write(bytes("stop", 'utf-8'))
                     print("\n------------------------------------------------")
                     print("A discreet time of 10 seconds has passed.")
                     print("\nEncryption Metrics for 10 seconds: ")
@@ -162,7 +167,7 @@ def main():
                     print("Average throughput: ", avg_throughput, "Kbps")
 
                     avg_ram = round(sum(ram_list) / len(ram_list), 2)
-                    print("Average memory usage: ", avg_ram, "MB")
+                    print("Average memory footprint: ", avg_ram, "bytes")
 
                     with open ('output.txt', 'r') as file:
                         lines = file.readlines()
@@ -198,6 +203,7 @@ def main():
         elif args.algorithm == "grain-v1":
             sys.path.append('LW_Ciphers/Grain-v1')
             from cGrain_main import c_grain_v1_encrypt_file
+            algo_name = args.algorithm + "_enc"  # Name of the algorithm
             print("------------------------------------------------")
             print("Using Grain-v1 for encrypting the video stream")
             random_key_bits, random_bytes = generate_random_key(80)
@@ -214,6 +220,7 @@ def main():
             cycle_count_enc = []
             total_frame_bytes = 0
             bcmticks_process = subprocess.Popen(["./first_cycles"])
+            arduino_serial.write(bytes(algo_name, 'utf-8'))
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -238,6 +245,7 @@ def main():
                 if elapsed_time >= 10:
                     bcmticks_process.terminate()
                     os.system(f"kill -9 {bcmticks_process.pid}")
+                    arduino_serial.write(bytes("stop", 'utf-8'))
                     print("\n------------------------------------------------")
                     print("A discreet time of 10 seconds has passed.")
                     print("\nEncryption Metrics for 10 seconds: ")
@@ -248,7 +256,7 @@ def main():
                     print("Average throughput: ", avg_throughput, "Kbps")
 
                     avg_ram = round(sum(ram_list) / len(ram_list), 2)
-                    print("Average memory usage: ", avg_ram, "MB")
+                    print("Average memory usage: ", avg_ram, "bytes")
 
                     with open ('output.txt', 'r') as file:
                         lines = file.readlines()
@@ -284,6 +292,7 @@ def main():
         elif args.algorithm == "mickey":
             sys.path.append('LW_Ciphers/Mickey-v2')
             from cMickey_main import c_mickey_encrypt_file
+            algo_name = args.algorithm + "_enc"  # Name of the algorithm
             print("------------------------------------------------")
             print("Using Mickey for encrypting the video stream")
             random_key_bits, random_bytes = generate_random_key(80)
@@ -300,6 +309,7 @@ def main():
             cycle_count_enc = []
             total_frame_bytes = 0
             bcmticks_process = subprocess.Popen(["./first_cycles"])
+            arduino_serial.write(bytes(algo_name, 'utf-8'))
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -325,6 +335,7 @@ def main():
                 if elapsed_time >= 10:
                     bcmticks_process.terminate()
                     os.system(f"kill -9 {bcmticks_process.pid}")
+                    arduino_serial.write(bytes("stop", 'utf-8'))
                     print("\n------------------------------------------------")
                     print("A discreet time of 10 seconds has passed.")
                     print("\nEncryption Metrics for 10 seconds: ")
@@ -335,7 +346,7 @@ def main():
                     print("Average throughput: ", avg_throughput, "Kbps")
 
                     avg_ram = round(sum(ram_list) / len(ram_list), 2)
-                    print("Average memory usage: ", avg_ram, "MB")
+                    print("Average memory usage: ", avg_ram, "bytes")
 
                     with open ('output.txt', 'r') as file:
                         lines = file.readlines()
@@ -371,6 +382,7 @@ def main():
         elif args.algorithm == "trivium":
             sys.path.append('LW_Ciphers/Trivium')
             from cTRivium_main import c_trivium_encrypt_file
+            algo_name = args.algorithm + "_enc"  # Name of the algorithm
             print("------------------------------------------------")
             print("Using Trivium for encrypting the video stream")
             random_key_bits, random_bytes = generate_random_key(80)
@@ -387,6 +399,7 @@ def main():
             cycle_count_enc = []
             total_frame_bytes = 0
             bcmticks_process = subprocess.Popen(["./first_cycles"])
+            arduino_serial.write(bytes(algo_name, 'utf-8'))
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -411,6 +424,7 @@ def main():
                 if elapsed_time >= 10:
                     bcmticks_process.terminate()
                     os.system(f"kill -9 {bcmticks_process.pid}")
+                    arduino_serial.write(bytes("stop", 'utf-8'))
                     print("\n------------------------------------------------")
                     print("A discreet time of 10 seconds has passed.")
                     print("\nEncryption Metrics for 10 seconds: ")
@@ -421,7 +435,7 @@ def main():
                     print("Average throughput: ", avg_throughput, "Kbps")
 
                     avg_ram = round(sum(ram_list) / len(ram_list), 2)
-                    print("Average memory usage: ", avg_ram, "MB")
+                    print("Average memory usage: ", avg_ram, "bytes")
 
                     with open ('output.txt', 'r') as file:
                         lines = file.readlines()
@@ -457,6 +471,7 @@ def main():
         elif args.algorithm == "salsa":
             sys.path.append('LW_Ciphers/Salsa')
             from cSalsa_main import c_salsa_encrypt_file
+            algo_name = args.algorithm + "_enc"  # Name of the algorithm
             print("------------------------------------------------")
             print("Using Salsa for encrypting the video stream")
             random_key_bits, random_bytes = generate_random_key(128)
@@ -473,6 +488,7 @@ def main():
             cycle_count_enc = []
             total_frame_bytes = 0
             bcmticks_process = subprocess.Popen(["./first_cycles"])
+            arduino_serial.write(bytes(algo_name, 'utf-8'))
             while True:
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
@@ -497,6 +513,7 @@ def main():
                 if elapsed_time >= 10:
                     bcmticks_process.terminate()
                     os.system(f"kill -9 {bcmticks_process.pid}")
+                    arduino_serial.write(bytes("stop", 'utf-8'))
                     print("\n------------------------------------------------")
                     print("A discreet time of 10 seconds has passed.")
                     print("\nEncryption Metrics for 10 seconds: ")
@@ -507,7 +524,7 @@ def main():
                     print("Average throughput: ", avg_throughput, "Kbps")
 
                     avg_ram = round(sum(ram_list) / len(ram_list), 2)
-                    print("Average memory usage: ", avg_ram, "MB")
+                    print("Average memory usage: ", avg_ram, "bytes")
 
                     with open ('output.txt', 'r') as file:
                         lines = file.readlines()
@@ -544,6 +561,7 @@ def main():
 
             sys.path.append('LW_Ciphers/Sosemanuk')
             from cSosemanuk_main import c_sosemanuk_encrypt_file
+            algo_name = args.algorithm + "_enc"
             print("------------------------------------------------")
             print("Using Sosemanuk for encrypting the video stream")
             random_key_bits, random_bytes = generate_random_key(128)
@@ -560,7 +578,9 @@ def main():
             cycle_count_enc = []
             total_frame_bytes = 0
             bcmticks_process = subprocess.Popen(["./first_cycles"])
-            while True:
+            arduino_serial.write(bytes(algo_name, 'utf-8'))
+            while True:  
+                # arduino_serial.write(bytes(algo_name, 'utf-8'))
                 ret, frame = camera.read()
                 frame = cv2.resize(frame, (640, 480))
                 frame_bytes = cv2.imencode('.JPEG', frame)[1].tobytes()
@@ -569,7 +589,6 @@ def main():
 
                 #with open('bird.jpeg', 'rb') as file:
                 #    plaintext = file.read()
-                    
 
                 # Encrypt the frame
                 encrypted_bytes, enc_time, enc_throughput, enc_ram = c_sosemanuk_encrypt_file(frame_bytes, key)
@@ -590,6 +609,7 @@ def main():
                 if elapsed_time >= 10:
                     bcmticks_process.terminate()
                     os.system(f"kill -9 {bcmticks_process.pid}")
+                    arduino_serial.write(bytes("stop", 'utf-8'))
                     print("\n------------------------------------------------")
                     print("A discreet time of 10 seconds has passed.")
                     print("\nEncryption Metrics for 10 seconds: ")
@@ -600,7 +620,7 @@ def main():
                     print("Average throughput: ", avg_throughput, "Kbps")
 
                     avg_ram = round(sum(ram_list) / len(ram_list), 2)
-                    print("Average memory usage: ", avg_ram, "MB")
+                    print("Average memory usage: ", avg_ram, "bytes")
 
                     with open ('output.txt', 'r') as file:
                         lines = file.readlines()
@@ -646,6 +666,6 @@ def main():
         client_socket.close()
 
 if __name__ == "__main__":
-    random_key_bits, random_bytes = generate_random_key(128)
-    print(random_bytes)
+    # random_key_bits, random_bytes = generate_random_key(128)
+    # print(random_bytes)
     main()

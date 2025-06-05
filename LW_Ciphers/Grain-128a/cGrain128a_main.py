@@ -1,6 +1,8 @@
 import ctypes
 import time
 import psutil
+import subprocess
+import os
 
 crypto_lib = ctypes.CDLL('LW_Ciphers/Grain-128a/grain128aead_32p.so')
 
@@ -32,20 +34,46 @@ crypto_lib.crypto_aead_decrypt.argtypes = [
 ]
 crypto_lib.crypto_aead_decrypt.restype = ctypes.c_int  # Return type int
 
+
 def crypto_aead_decrypt(m, mlen, nsec, cp, clen, adp, adlen, npubp, kp):
     return crypto_lib.crypto_aead_decrypt(m, mlen, nsec, cp, clen, adp, adlen, npubp, kp)
 
 def crypto_aead_encrypt(c, clen, m, mlen, ad, adlen, nsec, npub, k):
     return crypto_lib.crypto_aead_encrypt(c, clen, m, mlen, ad, adlen, nsec, npub, k)
 
+def get_memory_usage():
+    """Get the current memory usage of the process.
 
+    Returns:
+    int: The memory usage in bytes.
+    """
+    process = subprocess.Popen("ps -p %d -o rss | tail -n 1" % os.getpid(), shell=True, stdout=subprocess.PIPE)
+    out, _ = process.communicate()
+    memory = int(out.strip()) * 1024  # Convert from KB to bytes
+    return memory
+
+# def get_memory_usage_proc(pid):
+#     """Get the memory usage of a process using the /proc filesystem."""
+#     try:
+#         with open(f"/proc/{pid}/status", "r") as status_file:
+#             for line in status_file:
+#                 if line.startswith("VmRSS:"):
+#                     return int(line.split()[1])  # Memory usage in kilobytes
+#     except FileNotFoundError:
+#         print(f"Error: Process with PID {pid} not found.")
+#         return None
 
 def c_grain128_encrypt_file(plaintext, key):
 
     len_key = len(key)
     len_plaintext = len(plaintext)
-    file_size_Kb = len_plaintext * 8 / 1000
+    # print("Length of frame:", len_plaintext)
+    file_size_Kb = len_plaintext * 8 / 1000  # File size in Kilobits
 
+    # pid = os.getpid()
+    # print("PID:", pid)
+    # start_memory = get_memory_usage_proc(pid)
+    memory_before = get_memory_usage()
     hex_image_bytes_literal = plaintext
 
     # Example usage
@@ -53,37 +81,29 @@ def c_grain128_encrypt_file(plaintext, key):
     m_buffer = ctypes.create_string_buffer(hex_image_bytes_literal)  # Example buffer for plaintext
     m_ptr = ctypes.cast(m_buffer, ctypes.POINTER(ctypes.c_ubyte))
     mlen = ctypes.c_ulonglong(len(m))  # Length of the message
-
     ad = b"additional data"  # Example additional data
     ad_buffer = ctypes.create_string_buffer(ad)
     ad_ptr = ctypes.cast(ad_buffer, ctypes.POINTER(ctypes.c_ubyte))
     adlen = ctypes.c_ulonglong(len(ad))  # Length of additional data
-
     nsec = None  # Example value for nsec (can be None)
-
     npub = b"nonce"  # Example nonce
     npub_buffer = ctypes.create_string_buffer(npub)
     npub_ptr = ctypes.cast(npub_buffer, ctypes.POINTER(ctypes.c_ubyte))
-
     k = key  # Example key
     k_buffer = ctypes.create_string_buffer(k)
     k_ptr = ctypes.cast(k_buffer, ctypes.POINTER(ctypes.c_ubyte))
-
     c_len = ctypes.c_ulonglong()  # Example variable for clen
-
+    
     c_buffer = ctypes.create_string_buffer(len(m) + 16)  # Example buffer for ciphertext
     c_ptr = ctypes.cast(c_buffer, ctypes.POINTER(ctypes.c_ubyte))
 
     start_time = time.perf_counter()
     # Call the function
     result_encrypt = crypto_aead_encrypt(c_ptr, ctypes.byref(c_len), m_ptr, mlen, ad_ptr, adlen, nsec, npub_ptr, k_ptr)
-
     end_time = time.perf_counter()
-
-    Process = psutil.Process()
-    avg_ram = Process.memory_info().rss / 1024 / 1024
-
     encryption_time = end_time - start_time
+    memory_after = get_memory_usage()
+    # end_memory = get_memory_usage_proc(pid)
 
     if result_encrypt == 0:
         # print("Encryption successful!")
@@ -91,17 +111,20 @@ def c_grain128_encrypt_file(plaintext, key):
 
         formatted_encryption_time = round(encryption_time, 2)
 
-        #print("Total encryption time:", formatted_encryption_time, "seconds")
+        # print("Total encryption time:", formatted_encryption_time, "seconds")
 
         throughput = round(file_size_Kb / encryption_time, 2)   # Throughput in Kbps
 
-        #print("Encryption Throughput:", throughput, "Kbps")
+        # print("Encryption Throughput:", throughput, "Kbps")
 
-        ram = round(avg_ram, 2)
+        memory_consumption = round(memory_after, 2)
+        memory_footprint = round((memory_after) / len(plaintext), 2)
+        # print("Memory usage:", memory_consumption, "bytes")
+        # print("Memory footprint:", memory_footprint, "bytes per byte of plaintext")
+        # memory_consumption = end_memory - start_memory
+        # print("Memory usage:", memory_consumption, "bytes")
 
-        #print("Average memory usage:", ram, "MB")
-
-        return buffer_contents, formatted_encryption_time, throughput, ram
+        return buffer_contents, formatted_encryption_time, throughput, memory_footprint 
     else:
         print("Encryption failed!")
 
